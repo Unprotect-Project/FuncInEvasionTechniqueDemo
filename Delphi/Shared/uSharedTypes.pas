@@ -13,7 +13,8 @@ unit uSharedTypes;
 
 interface
 
-uses Winapi.Winsock2;
+uses Winapi.Windows,
+     Winapi.Winsock2;
 
 type
   PSocket = ^TSocket;
@@ -30,6 +31,9 @@ type
 
   TFuncIn__RemoteShell__Information = record
     Header                : TFuncIn_Header;
+
+    StartupInformationLen : DWORD;
+    ProcessInformationLen : DWORD;
 
     // we use UInt64 for interoperability between an x32 controller
     // and a x64 loader and vis-versa.

