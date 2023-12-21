@@ -21,11 +21,11 @@ The modular nature of the malware, with the final payloads not being directly in
 * Full interoperability between x86-32 Controller and x86-64 Loader and vis-versa.
 * Designed to be easily extended in feature for practicing and learning purpose.
 
-## WIP
-
-* Demonstrate with additional programming languages (Next is Python)
-
 ## Changelog
+
+## 21 Dec 2023
+
+* Python version of the controller added
 
 ## 15 Dec 2023
 
